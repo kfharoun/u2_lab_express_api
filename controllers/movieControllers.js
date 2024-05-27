@@ -190,6 +190,41 @@ const createMovie = async (req, res) => {
         return res.status(500).json({error: error.message})
     }
 }
+
+const byTitle = async (req, res) => {
+    try {
+        const { title } = req.params
+        
+        const movies = await Movie.aggregate([
+            { //https://www.geeksforgeeks.org/mongodb-query-with-case-insensitive-search/
+                // i stands for case insensitive 
+                $match: { title: { $regex: new RegExp(title, 'i') } }
+            },
+            {
+                $lookup: {
+                    from: 'actors',
+                    localField: '_id',
+                    foreignField: 'movie',
+                    as: 'actors'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'reviews',
+                    localField: '_id',
+                    foreignField: 'movie',
+                    as: 'reviews'
+                }
+            }
+        ])
+
+        res.json(movies)
+    } catch (error) {
+        return res.status(500).send(error.message)
+    }
+}
+
+    
 module.exports = {
     getAllMovies,
     getAllActors,
@@ -200,5 +235,6 @@ module.exports = {
     getInfoById, 
     deleteMovie, 
     updateMovie, 
-    createMovie
+    createMovie, 
+    byTitle
 }

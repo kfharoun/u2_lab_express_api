@@ -9,6 +9,8 @@ const PORT = process.env.PORT || 3001
 const app = express()
 app.use(logger('dev'))
 app.use(bodyParser.json())
+const cors = require('cors')
+app.use(cors())
 
 app.listen(PORT, () => {
   console.log(`Express server listening on port ${PORT}`)
@@ -46,3 +48,7 @@ app.put(`/movie/:id`, movieControllers.updateMovie)
 // delete 
 
 app.delete('/movie/:id', movieControllers.deleteMovie)
+
+// find by title
+
+app.get(`/movies/:title`, movieControllers.byTitle)
